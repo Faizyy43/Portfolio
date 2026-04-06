@@ -1,12 +1,25 @@
 import express from "express";
-import Project from "../models/Project.js";
+import {
+  createProject,
+  getProjects,
+  updateProject,
+  deleteProject,
+} from "../controllers/project.controller.js";
+
+import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
-// GET all projects
-router.get("/", async (req, res) => {
-  const projects = await Project.find();
-  res.json(projects);
-});
+// ➕ CREATE (Admin)
+router.post("/", upload.single("image"), createProject);
+
+// 📥 GET ALL (Public)
+router.get("/", getProjects);
+
+// ✏️ UPDATE
+router.put("/:id", upload.single("image"), updateProject);
+
+// ❌ DELETE
+router.delete("/:id", deleteProject);
 
 export default router;

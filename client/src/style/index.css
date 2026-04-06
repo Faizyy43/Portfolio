@@ -1,0 +1,218 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 🔥 GLOBAL SCROLL */
+html,
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* LENIS FIX */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth body {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* 🔥 BACKGROUND */
+body {
+  background: radial-gradient(circle at top, #0f172a, #000);
+}
+
+/* 🔥 INPUT */
+.input {
+  @apply p-2 bg-gray-800 rounded outline-none border border-white/10;
+}
+
+/* 🔥 BETTER TRANSITIONS (FIXED PERFORMANCE) */
+button,
+a,
+input,
+.card,
+.glass-card {
+  transition: all 0.3s ease;
+}
+
+/* 🔥 SCROLLBAR (MERGED + CLEAN) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+/* 🔥 GLOW EFFECT */
+.glow {
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+/* 🔥 GLASS CARD */
+.glass-card {
+  @apply bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* 🔥 TITLES */
+.section-title {
+  @apply text-lg font-semibold mb-4;
+}
+
+/* 🔥 FADE IN (MERGED SINGLE VERSION) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 🔥 GRADIENT ANIMATION */
+@keyframes gradientMove {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 200%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradientMove 3s linear infinite;
+}
+
+/* 🔥 SMOOTH SCROLL ENHANCEMENT */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* 🔥 OPTIONAL: HIDE SCROLLBAR ON MOBILE */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+/* 🌙 DARK MODE (DEFAULT) */
+html.dark body {
+  background: radial-gradient(circle at top, #0f172a, #000);
+  color: #ffffff;
+}
+
+/* ☀️ LIGHT MODE (LUXURY GOLD) */
+html.light body {
+  background: #ffffff;
+  color: #111111;
+}
+
+/* 🔥 NAVBAR BACKGROUND */
+html.light nav {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+html.dark nav {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* 🔥 CARD */
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+html.dark .glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 🔥 GOLD TEXT */
+.gold-gradient {
+  background: linear-gradient(90deg, #d4af37, #f5d76e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 🔥 BUTTON GOLD */
+.gold-btn {
+  background: linear-gradient(135deg, #d4af37, #f5d76e);
+  color: #111;
+}
+
+.gold-btn:hover {
+  opacity: 0.9;
+}
+
+/* 🔥 BORDER GOLD */
+.gold-border {
+  border-color: #d4af37 !important;
+}
+
+/* 🔥 HOVER GOLD */
+.gold-hover:hover {
+  color: #d4af37;
+}
+
+@layer base {
+  html {
+    overscroll-behavior-y: none;
+  }
+  body {
+    @apply overflow-x-hidden;
+  }
+  /* #root {
+    @apply min-h-screen bg-black;
+  } */
+}
+
+.input-premium {
+  @apply w-full px-4 py-2 rounded-xl 
+  bg-white/5 border border-white/10 
+  text-white placeholder-gray-400
+  focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.upload-box {
+  @apply flex flex-col items-center justify-center
+  border border-dashed border-white/20
+  rounded-xl p-4 cursor-pointer
+  hover:bg-white/5 transition;
+}
+
+.btn-magnetic {
+  transition: transform 0.2s ease;
+}
+
+.btn-magnetic:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+body {
+  cursor: none;
+}
