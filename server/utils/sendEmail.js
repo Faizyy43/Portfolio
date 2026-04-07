@@ -1,23 +1,21 @@
-import nodemailer from "nodemailer";
+import { transporter } from "./mailer.js";
 
 export const sendEmail = async (data) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "faizansorthiya0@gmail.com",
-      pass: "rmnodrmpftjlsjpr",
-    },
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Portfolio" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_USER,
+      subject: "🔥 New Client Lead",
+      html: `
+        <h3>New Lead</h3>
+        <p>Name: ${data.name}</p>
+        <p>Email: ${data.email}</p>
+        <p>Message: ${data.message}</p>
+      `,
+    });
 
-  await transporter.sendMail({
-    from: "Portfolio",
-    to: "faizansorthiya0@gmail.com",
-    subject: "🔥 New Client Lead",
-    html: `
-      <h3>New Lead</h3>
-      <p>Name: ${data.name}</p>
-      <p>Email: ${data.email}</p>
-      <p>Message: ${data.message}</p>
-    `,
-  });
+    console.log("✅ Lead Email Sent");
+  } catch (error) {
+    console.log("❌ Lead Email Error:", error.message);
+  }
 };
