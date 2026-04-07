@@ -9,32 +9,47 @@ export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
 
-    // 🔐 allow only admin email
-    if (email !== "faizansorthiya0@gmail.com") {
+    // 🔐 allow only admin email (ENV BASED)
+    if (email !== process.env.ADMIN_EMAIL) {
       return res.status(403).json({ message: "Unauthorized ❌" });
     }
 
     // 🔢 generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    otpStore[email] = otp;
+    // ⏳ store OTP with expiry (5 min)
+    otpStore[email] = {
+      otp,
+      expires: Date.now() + 5 * 60 * 1000,
+    };
 
-    // 📧 mail config
+    // 📧 mail config (STRONG VERSION)
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
 
+    // ✅ verify connection (important)
+    await transporter.verify();
+
     // ✉️ send mail
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Admin Panel" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Admin Login OTP",
-      text: `Your OTP is ${otp}`,
+      subject: "🔐 Admin Login OTP",
+      html: `
+        <h2>Your OTP Code</h2>
+        <p style="font-size:20px;font-weight:bold">${otp}</p>
+        <p>This OTP will expire in 5 minutes.</p>
+      `,
     });
+
+    console.log("OTP SENT:", otp);
 
     res.status(200).json({
       success: true,
@@ -42,9 +57,11 @@ export const sendOtp = async (req, res) => {
     });
   } catch (error) {
     console.error("SEND OTP ERROR:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to send OTP ❌",
+      error: error.message, // helpful debug
     });
   }
 };
@@ -58,18 +75,26 @@ export const verifyOtp = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized ❌" });
     }
 
-    if (!otpStore[email]) {
+    const record = otpStore[email];
+
+    if (!record) {
       return res.status(400).json({ message: "OTP expired ❌" });
     }
 
-    if (otpStore[email] != otp) {
+    // ⏳ check expiry
+    if (Date.now() > record.expires) {
+      delete otpStore[email];
+      return res.status(400).json({ message: "OTP expired ❌" });
+    }
+
+    if (record.otp != otp) {
       return res.status(400).json({ message: "Invalid OTP ❌" });
     }
 
     const accessToken = jwt.sign(
       { email, role: "admin" },
       process.env.JWT_SECRET || "fallbacksecret",
-      { expiresIn: "15m" }
+      { expiresIn: "15m" },
     );
 
     delete otpStore[email];
@@ -78,9 +103,11 @@ export const verifyOtp = async (req, res) => {
       success: true,
       accessToken,
     });
-
   } catch (error) {
     console.error("VERIFY OTP ERROR:", error);
-    res.status(500).json({ message: "Server error ❌" });
+
+    res.status(500).json({
+      message: "Server error ❌",
+    });
   }
 };

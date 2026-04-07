@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
 import http from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
@@ -19,20 +18,35 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ CORS FIXED
+/* ================= CORS (FIXED PROPERLY) ================= */
+const allowedOrigins = [
+  "https://faizfolio-two.vercel.app",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: "https://faizfolio-two.vercel.app",
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps / postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
 
+/* ================= MIDDLEWARE ================= */
 app.use(express.json());
 
-// 🔥 SOCKET
+/* ================= SOCKET.IO ================= */
 const io = new Server(server, {
   cors: {
-    origin: "https://faizfolio-two.vercel.app",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
@@ -53,6 +67,7 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
@@ -60,23 +75,30 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
-// ✅ DB
+/* ================= DATABASE ================= */
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("DB Connected"))
-  .catch((err) => console.log(err));
+  .then(() => console.log("✅ DB Connected"))
+  .catch((err) => console.error("❌ DB Error:", err));
 
-// ✅ static
+/* ================= STATIC ================= */
 app.use("/uploads", express.static("uploads"));
 
-// ✅ routes
+/* ================= ROUTES ================= */
 app.use("/api/projects", projectRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-// ✅ PORT FIXED
+/* ================= HEALTH CHECK (VERY IMPORTANT) ================= */
+app.get("/", (req, res) => {
+  res.send("🚀 API is running");
+});
+
+/* ================= SERVER ================= */
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
