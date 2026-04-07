@@ -19,7 +19,7 @@ function Dropdown({ label, options, value, onChange }) {
         ${
           isLight
             ? "bg-white border border-gray-300 hover:border-blue-500"
-            : "bg-gray-900 border border-gray-700 hover:border-blue-400 shadow-[0_0_0px_rgba(59,130,246,0)] focus:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+            : "bg-gray-900 border border-gray-700 hover:border-blue-400"
         }`}
       >
         <span className={value ? "" : "opacity-50"}>{value || label}</span>
@@ -95,7 +95,18 @@ export default function Contact() {
 
     try {
       setLoading(true);
-      await api.post("/contact", form);
+
+      // ✅ FIX: define data properly
+      const data = { ...form };
+
+      try {
+        await api.post("/contact", data);
+      } catch (err) {
+        // 🔥 retry for Render wake-up
+        await new Promise((res) => setTimeout(res, 2000));
+        await api.post("/contact", data);
+      }
+
       toast.success("Submitted successfully");
 
       setForm({
@@ -116,16 +127,14 @@ export default function Contact() {
   return (
     <div
       className={`min-h-screen flex items-center justify-center px-4 py-20 mt-5 relative overflow-hidden
-      ${isLight ? "bg-white" : "bg-black"}
-    `}
+      ${isLight ? "bg-white" : "bg-black"}`}
     >
-      {/* 🌌 SPACE BACKGROUND */}
+      {/* 🌌 BACKGROUND */}
       {!isLight && (
         <>
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
             <div className="w-full h-full bg-[radial-gradient(circle,white_1px,transparent_1px)] [background-size:30px_30px]" />
           </div>
-
           <div className="absolute top-[-200px] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-500/10 blur-[140px]" />
         </>
       )}
@@ -136,11 +145,10 @@ export default function Contact() {
         className={`relative w-full max-w-2xl rounded-2xl p-8 md:p-10 transition-all
         ${
           isLight
-            ? "bg-white border border-gray-300 shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
-            : "bg-gray-900 border border-gray-700 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.5)]"
+            ? "bg-white border border-gray-300 shadow-lg"
+            : "bg-gray-900 border border-gray-700 backdrop-blur-xl shadow-xl"
         }`}
       >
-        {/* HEADER */}
         <div className="mb-8 text-center">
           <h2 className="text-2xl md:text-3xl font-semibold">
             Start a Project
@@ -150,7 +158,6 @@ export default function Contact() {
           </p>
         </div>
 
-        {/* FORM */}
         <form onSubmit={submit} className="space-y-5">
           {["name", "email"].map((field, i) => (
             <input
@@ -158,16 +165,15 @@ export default function Contact() {
               placeholder={field === "name" ? "Full Name" : "Email Address"}
               value={form[field]}
               onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-              className={`w-full p-3 rounded-lg outline-none transition-all duration-300
+              className={`w-full p-3 rounded-lg outline-none transition-all
               ${
                 isLight
                   ? "border border-gray-300 focus:border-blue-500"
-                  : "bg-black border border-gray-700 focus:border-blue-400 focus:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                  : "bg-black border border-gray-700 focus:border-blue-400"
               }`}
             />
           ))}
 
-          {/* DROPDOWNS */}
           <div className="grid md:grid-cols-3 gap-4">
             <Dropdown
               label="Project Type"
@@ -189,28 +195,26 @@ export default function Contact() {
             />
           </div>
 
-          {/* MESSAGE */}
           <textarea
             rows={5}
             placeholder="Project Description"
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}
-            className={`w-full p-3 rounded-lg outline-none transition-all
+            className={`w-full p-3 rounded-lg outline-none
             ${
               isLight
                 ? "border border-gray-300 focus:border-blue-500"
-                : "bg-black border border-gray-700 focus:border-blue-400 focus:shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                : "bg-black border border-gray-700 focus:border-blue-400"
             }`}
           />
 
-          {/* BUTTON */}
           <button
             disabled={loading}
-            className={`w-full py-3 rounded-lg font-medium transition-all duration-300
+            className={`w-full py-3 rounded-lg font-medium transition-all
             ${
               isLight
                 ? "bg-blue-500 text-white hover:bg-blue-600"
-                : "bg-gradient-to-r from-blue-500 to-pink-500 text-white hover:opacity-90 shadow-[0_0_30px_rgba(59,130,246,0.4)]"
+                : "bg-gradient-to-r from-blue-500 to-pink-500 text-white"
             }`}
           >
             {loading ? "Processing..." : "Submit Request →"}
