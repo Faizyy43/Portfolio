@@ -6,35 +6,66 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   const { name, email, message } = req.body;
 
-  try {
-    // 🔥 DEBUG (optional but helpful)
-    console.log("EMAIL_USER:", process.env.EMAIL_USER);
-    console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded ✅" : "Missing ❌");
+  // ✅ BASIC VALIDATION
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
+  try {
+    // ✅ DEBUG LOGS (SAFE)
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+    console.log(
+      "EMAIL_PASS:",
+      process.env.EMAIL_PASS ? "Loaded ✅" : "Missing ❌",
+    );
+
+    // 🔥 STRONG TRANSPORTER (BETTER THAN service:gmail)
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true, // ✅ important
       auth: {
-        user: process.env.EMAIL_USER, // ✅ FIXED
-        pass: process.env.EMAIL_PASS, // ✅ FIXED
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
-    await transporter.sendMail({
-      from: email,
-      to: process.env.EMAIL_USER, // ✅ FIXED
-      subject: "New Client Message 🚀",
+    // ✅ VERIFY CONNECTION (VERY IMPORTANT)
+    await transporter.verify();
+
+    // 📩 SEND EMAIL
+    const info = await transporter.sendMail({
+      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+      replyTo: email,
+      to: process.env.EMAIL_USER,
+      subject: `🚀 New Message from ${name}`,
       html: `
-        <h2>New Lead</h2>
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Message:</b> ${message}</p>
+        <div style="font-family:sans-serif;padding:20px">
+          <h2>New Client Message</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Message:</strong></p>
+          <div style="background:#f5f5f5;padding:10px;border-radius:6px">
+            ${message}
+          </div>
+        </div>
       `,
     });
 
-    res.json({ success: true });
+    console.log("Email sent:", info.messageId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Email sent successfully",
+    });
   } catch (err) {
-    console.log("EMAIL ERROR:", err); // ✅ DEBUG
-    res.status(500).json(err.message);
+    console.error("EMAIL ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      error: "Email failed to send",
+      details: err.message, // helpful for debugging
+    });
   }
 });
 
