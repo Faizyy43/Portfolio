@@ -18,7 +18,7 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-/* ================= CORS (FIXED PROPERLY) ================= */
+/* ================= CORS (FINAL FIX) ================= */
 const allowedOrigins = [
   "https://faizfolio-two.vercel.app",
   "http://localhost:5173",
@@ -26,19 +26,35 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps / postman)
-      if (!origin) return callback(null, true);
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow postman / mobile
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        return callback(new Error("Not allowed by CORS"));
+        console.log("❌ CORS BLOCKED:", origin);
+        return callback(null, false); // don't crash server
       }
     },
     credentials: true,
   }),
 );
+
+/* 🔥 IMPORTANT: HANDLE PREFLIGHT */
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // TEMP SAFE FIX
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+  );
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
@@ -91,9 +107,15 @@ app.use("/api/auth", authRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-/* ================= HEALTH CHECK (VERY IMPORTANT) ================= */
+/* ================= HEALTH CHECK ================= */
 app.get("/", (req, res) => {
   res.send("🚀 API is running");
+});
+
+/* ================= GLOBAL ERROR HANDLER ================= */
+app.use((err, req, res, next) => {
+  console.error("🔥 SERVER ERROR:", err.message);
+  res.status(500).json({ error: err.message });
 });
 
 /* ================= SERVER ================= */
