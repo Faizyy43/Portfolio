@@ -27,12 +27,16 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  const hideLayout =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/dashboard");
+
   if (loading) return <Loader />;
 
   return (
     <>
-      {!location.pathname.includes("dashboard") && <Navbar />}
-
+      {/* {!location.pathname.includes("dashboard") && <Navbar />} */}
+      {!hideLayout && <Navbar />}
       <div>
         {/* 🔥 FIX: use location.key for smooth routing */}
         <AnimatePresence mode="wait">
@@ -90,10 +94,10 @@ export default function App() {
       </div>
 
       {/* <WhatsAppButton /> */}
-      <ReviewBot />
+      {!hideLayout && <ReviewBot />}
       <AnimatedCursor />
-
-      {!location.pathname.includes("dashboard") && <Footer />}
+      {!hideLayout && <Footer />}
+      {/* {!location.pathname.includes("dashboard") && <Footer />} */}
     </>
   );
 }

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function Sidebar({
   active,
@@ -42,9 +43,11 @@ export default function Sidebar({
           className="text-xl font-bold flex items-center gap-2 mb-10 tracking-wide"
         >
           {/* <span className="text-yellow-400 text-2xl">⚡</span> */}
+          <Link to={"/"}>
           <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
             Faizan
           </span>
+          </Link>
         </motion.h2>
 
         {/* MENU */}
