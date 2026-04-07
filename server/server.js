@@ -13,32 +13,26 @@ import authRoutes from "./routes/auth.routes.js";
 import emailRoutes from "./routes/email.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 
-// ✅ FIXED ENV LOAD
-dotenv.config({ path: path.resolve("./.env") });
-
-// ✅ DEBUG
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded ✅" : "Missing ❌");
+// ✅ ENV
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
-// app.use(cors());
-
+// ✅ CORS FIXED
 app.use(
   cors({
-    origin: "https://faizfolio-two.vercel.app/",
+    origin: "https://faizfolio-two.vercel.app",
     credentials: true,
   }),
 );
-const cors = require("cors");
 
 app.use(express.json());
 
 // 🔥 SOCKET
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://faizfolio-two.vercel.app",
     methods: ["GET", "POST"],
   },
 });
@@ -82,5 +76,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-const PORT = 5000;
+// ✅ PORT FIXED
+const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

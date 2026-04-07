@@ -8,6 +8,7 @@ import { FaGithub } from "react-icons/fa";
 export default function ProjectList({ projects, refresh }) {
   const [selected, setSelected] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const API = import.meta.env.VITE_API_URL;
 
   const deleteProject = async (id) => {
     if (!window.confirm("Delete this project?")) return;
@@ -54,7 +55,7 @@ export default function ProjectList({ projects, refresh }) {
                   src={
                     p.image?.startsWith("http")
                       ? p.image
-                      : `http://localhost:5000/uploads/${p.image}`
+                      : `${API}/uploads/${p.image}`
                   }
                   alt="project"
                   className="w-full h-40 object-cover rounded-lg mb-4 border border-white/10"

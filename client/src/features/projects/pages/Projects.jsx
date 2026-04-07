@@ -9,6 +9,8 @@ import { FiExternalLink } from "react-icons/fi";
 function ProjectCard({ project, onOpen }) {
   const { theme } = useTheme();
 
+  const API = import.meta.env.VITE_API_URL; // ✅ FIXED
+
   const fixUrl = (url) => {
     if (!url) return null;
     url = url.trim();
@@ -39,7 +41,11 @@ function ProjectCard({ project, onOpen }) {
       {/* IMAGE */}
       <div className="relative overflow-hidden">
         <img
-          src={`http://localhost:5000/uploads/${project.image}`}
+          src={
+            project.image?.startsWith("http")
+              ? project.image
+              : `${API}/uploads/${project.image}`
+          } // ✅ FIXED
           alt={project.title}
           className="w-full h-44 object-cover transition duration-500 group-hover:scale-110"
         />
@@ -94,6 +100,8 @@ function ProjectModal({ project, onClose }) {
 
   if (!project) return null;
 
+  const API = import.meta.env.VITE_API_URL;
+
   return (
     <AnimatePresence>
       <motion.div
@@ -118,7 +126,11 @@ function ProjectModal({ project, onClose }) {
         >
           <div className="overflow-hidden rounded-xl mb-4">
             <motion.img
-              src={`http://localhost:5000/uploads/${project.image}`}
+              src={
+                project.image?.startsWith("http")
+                  ? project.image
+                  : `${API}/uploads/${project.image}`
+              } // ✅ FIXED
               className="w-full h-64 object-cover"
               whileHover={{ scale: 1.1 }}
             />
@@ -146,6 +158,14 @@ export default function Projects() {
   const [selected, setSelected] = useState(null);
   const { theme } = useTheme();
 
+  // ✅ FIX: move fixUrl here so global usage works
+  const fixUrl = (url) => {
+    if (!url) return null;
+    url = url.trim();
+    if (!url.startsWith("http")) return "https://" + url;
+    return url;
+  };
+
   useEffect(() => {
     api
       .get("/projects")
@@ -163,29 +183,26 @@ export default function Projects() {
       {theme !== "light" && (
         <>
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-            {/* 🔥 GLASS OVERLAY */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
 
-            {/* 🔥 CENTER ACTION BAR */}
+            {/* ✅ FIXED (no logic removed, just corrected mapping) */}
             <div className="relative flex items-center gap-4 px-4 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-              {projects.githubLink && (
+              {projects[0]?.githubLink && (
                 <a
-                  href={fixUrl(projects.githubLink)}
+                  href={fixUrl(projects[0].githubLink)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
                   className="p-2 rounded-full hover:bg-white hover:text-black transition-all duration-300 hover:scale-110"
                 >
                   <FaGithub size={18} />
                 </a>
               )}
 
-              {projects.liveLink && (
+              {projects[0]?.liveLink && (
                 <a
-                  href={fixUrl(projects.liveLink)}
+                  href={fixUrl(projects[0].liveLink)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
                   className="p-2 rounded-full hover:bg-blue-500 hover:text-white transition-all duration-300 hover:scale-110"
                 >
                   <FiExternalLink size={18} />

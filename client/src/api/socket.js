@@ -1,10 +1,12 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
-  transports: ["websocket"], // 🔥 important
-  auth: {
-    token: localStorage.getItem("token"),
-  },
-});
+const API = import.meta.env.VITE_API_URL;
 
-export default socket;
+export const createSocket = () => {
+  return io(API, {
+    transports: ["websocket"],
+    auth: {
+      token: localStorage.getItem("accessToken"),
+    },
+  });
+};
