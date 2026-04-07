@@ -34,6 +34,7 @@ export default function AdminLogin() {
       console.log("RESPONSE:", res.data); // 🔥 add this
 
       localStorage.setItem("accessToken", res.data.accessToken);
+      localStorage.setItem("refreshToken", res.data.refreshToken); // ✅ IMPORTANT
 
       navigate("/dashboard");
     } catch (err) {

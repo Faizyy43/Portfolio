@@ -23,7 +23,16 @@ console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded ✅" : "Missing ❌"
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+// app.use(cors());
+
+app.use(
+  cors({
+    origin: "https://faizfolio-two.vercel.app/",
+    credentials: true,
+  }),
+);
+const cors = require("cors");
+
 app.use(express.json());
 
 // 🔥 SOCKET

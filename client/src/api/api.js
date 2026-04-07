@@ -1,12 +1,15 @@
 import axios from "axios";
 
+// 🔥 ENV BASE URL
+const API = import.meta.env.VITE_API_URL;
+
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: `${API}/api`,
 });
 
 // 🔐 Attach token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken"); // ✅ FIXED
 
   if (token) {
     config.headers.Authorization = "Bearer " + token;
@@ -27,11 +30,14 @@ api.interceptors.response.use(
       const refreshToken = localStorage.getItem("refreshToken");
 
       try {
-        const res = await axios.post("http://localhost:5000/api/auth/refresh", {
-          refreshToken,
-        });
+        const res = await axios.post(
+          `${API}/api/auth/refresh`, // ✅ FIXED
+          {
+            refreshToken,
+          },
+        );
 
-        localStorage.setItem("token", res.data.accessToken);
+        localStorage.setItem("accessToken", res.data.accessToken);
 
         originalRequest.headers.Authorization =
           "Bearer " + res.data.accessToken;
