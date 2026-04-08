@@ -1,23 +1,41 @@
 import Project from "../models/Project.js";
 import cloudinary from "../config/cloudinary.js"; // ✅ ADD
+import streamifier from "streamifier"; // ✅ ADD
 
-// ➕ CREATE
 export const createProject = async (req, res) => {
   try {
     let imageUrl = "";
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imageUrl = result.secure_url;
+      try {
+        const streamUpload = () => {
+          return new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { folder: "projects" },
+              (error, result) => {
+                if (result) resolve(result);
+                else reject(error);
+              },
+            );
+            streamifier.createReadStream(req.file.buffer).pipe(stream);
+          });
+        };
+
+        const result = await streamUpload();
+        imageUrl = result.secure_url;
+      } catch (err) {
+        console.log("❌ Cloudinary error:", err.message);
+      }
     }
 
     const project = await Project.create({
       ...req.body,
-      image: imageUrl, // ✅ FIXED
+      image: imageUrl,
     });
 
     res.status(201).json(project);
   } catch (err) {
+    console.log("❌ CREATE ERROR:", err.message); // 🔥 ADD DEBUG
     res.status(500).json({ error: err.message });
   }
 };
@@ -34,8 +52,21 @@ export const updateProject = async (req, res) => {
     let updateData = { ...req.body };
 
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      updateData.image = result.secure_url; // ✅ FIXED
+      const streamUpload = () => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "projects" },
+            (error, result) => {
+              if (result) resolve(result);
+              else reject(error);
+            },
+          );
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const result = await streamUpload();
+      updateData.image = result.secure_url;
     }
 
     const updated = await Project.findByIdAndUpdate(req.params.id, updateData, {
@@ -44,6 +75,7 @@ export const updateProject = async (req, res) => {
 
     res.json(updated);
   } catch (err) {
+    console.log("❌ UPDATE ERROR:", err.message); // 🔥 DEBUG
     res.status(500).json({ error: err.message });
   }
 };
