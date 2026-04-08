@@ -10,40 +10,44 @@ export const submitContact = async (req, res) => {
 
     const newContact = await Contact.create(data);
 
-    const transporter = createTransporter(); // ✅ FIX
+    const transporter = createTransporter();
 
-    try {
-      await transporter.sendMail({
-        from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
-        to: process.env.EMAIL_USER,
-        subject: "New Project Inquiry",
-        html: `
-          <h3>New Inquiry</h3>
-          <p><b>Name:</b> ${data.name}</p>
-          <p><b>Email:</b> ${data.email}</p>
-          <p><b>Project:</b> ${data.projectType}</p>
-          <p><b>Budget:</b> ${data.budget}</p>
-          <p><b>Timeline:</b> ${data.timeline}</p>
-          <p><b>Message:</b> ${data.message}</p>
-        `,
-      });
+    // 🔥 SEND EMAIL IN BACKGROUND (IMPORTANT FIX)
+    (async () => {
+      try {
+        await transporter.sendMail({
+          from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+          to: process.env.EMAIL_USER,
+          subject: "New Project Inquiry",
+          html: `
+            <h3>New Inquiry</h3>
+            <p><b>Name:</b> ${data.name}</p>
+            <p><b>Email:</b> ${data.email}</p>
+            <p><b>Project:</b> ${data.projectType}</p>
+            <p><b>Budget:</b> ${data.budget}</p>
+            <p><b>Timeline:</b> ${data.timeline}</p>
+            <p><b>Message:</b> ${data.message}</p>
+          `,
+        });
 
-      await transporter.sendMail({
-        from: `"Faizan" <${process.env.EMAIL_USER}>`,
-        to: data.email,
-        subject: "We received your inquiry",
-        html: `
-          <p>Hello ${data.name},</p>
-          <p>Your request has been received.</p>
-          <p>Regards,<br/>Faizan</p>
-        `,
-      });
+        await transporter.sendMail({
+          from: `"Faizan" <${process.env.EMAIL_USER}>`,
+          to: data.email,
+          subject: "We received your inquiry",
+          html: `
+            <p>Hello ${data.name},</p>
+            <p>Your request has been received.</p>
+            <p>Regards,<br/>Faizan</p>
+          `,
+        });
 
-      console.log("✅ Emails sent");
-    } catch (emailError) {
-      console.log("❌ Email error:", emailError.message);
-    }
+        console.log("✅ Emails sent");
+      } catch (emailError) {
+        console.log("❌ Email error:", emailError.message);
+      }
+    })();
 
+    // ✅ RETURN RESPONSE IMMEDIATELY (IMPORTANT)
     res.status(200).json({ success: true });
   } catch (err) {
     console.log("❌ Server error:", err.message);
