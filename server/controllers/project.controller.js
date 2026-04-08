@@ -1,28 +1,40 @@
 import Project from "../models/Project.js";
-import cloudinary from "../config/cloudinary.js"; // ✅ ADD
-import streamifier from "streamifier"; // ✅ ADD
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 
+// 🔥 COMMON UPLOAD FUNCTION (REUSABLE)
+const uploadToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.buffer) {
+      return resolve(null); // ✅ prevent crash
+    }
+
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "projects" },
+      (error, result) => {
+        if (error) {
+          console.log("❌ Cloudinary Upload Error:", error.message);
+          return reject(error);
+        }
+        resolve(result);
+      },
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
+};
+
+// ➕ CREATE
 export const createProject = async (req, res) => {
   try {
     let imageUrl = "";
 
     if (req.file) {
       try {
-        const streamUpload = () => {
-          return new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-              { folder: "projects" },
-              (error, result) => {
-                if (result) resolve(result);
-                else reject(error);
-              },
-            );
-            streamifier.createReadStream(req.file.buffer).pipe(stream);
-          });
-        };
-
-        const result = await streamUpload();
-        imageUrl = result.secure_url;
+        const result = await uploadToCloudinary(req.file);
+        if (result) {
+          imageUrl = result.secure_url;
+        }
       } catch (err) {
         console.log("❌ Cloudinary error:", err.message);
       }
@@ -35,15 +47,20 @@ export const createProject = async (req, res) => {
 
     res.status(201).json(project);
   } catch (err) {
-    console.log("❌ CREATE ERROR:", err.message); // 🔥 ADD DEBUG
+    console.log("❌ CREATE ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
 
 // 📥 GET ALL
 export const getProjects = async (req, res) => {
-  const projects = await Project.find().sort({ createdAt: -1 });
-  res.json(projects);
+  try {
+    const projects = await Project.find().sort({ createdAt: -1 });
+    res.json(projects);
+  } catch (err) {
+    console.log("❌ FETCH ERROR:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
 
 // ✏️ UPDATE
@@ -51,31 +68,33 @@ export const updateProject = async (req, res) => {
   try {
     let updateData = { ...req.body };
 
-    if (req.file) {
-      const streamUpload = () => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: "projects" },
-            (error, result) => {
-              if (result) resolve(result);
-              else reject(error);
-            },
-          );
-          streamifier.createReadStream(req.file.buffer).pipe(stream);
-        });
-      };
+    // ✅ CHECK ID VALID
+    if (!req.params.id) {
+      return res.status(400).json({ error: "Project ID missing" });
+    }
 
-      const result = await streamUpload();
-      updateData.image = result.secure_url;
+    if (req.file) {
+      try {
+        const result = await uploadToCloudinary(req.file);
+        if (result) {
+          updateData.image = result.secure_url;
+        }
+      } catch (err) {
+        console.log("❌ Cloudinary UPDATE error:", err.message);
+      }
     }
 
     const updated = await Project.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
     });
 
+    if (!updated) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
     res.json(updated);
   } catch (err) {
-    console.log("❌ UPDATE ERROR:", err.message); // 🔥 DEBUG
+    console.log("❌ UPDATE ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
@@ -83,9 +102,15 @@ export const updateProject = async (req, res) => {
 // ❌ DELETE
 export const deleteProject = async (req, res) => {
   try {
-    await Project.findByIdAndDelete(req.params.id);
+    const deleted = await Project.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
     res.json({ message: "Deleted successfully" });
   } catch (err) {
+    console.log("❌ DELETE ERROR:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
