@@ -53,10 +53,13 @@ export default function ProjectList({ projects, refresh }) {
               {p.image && (
                 <img
                   src={
-                    p.image?.startsWith("http")
+                    p.image?.includes("res.cloudinary.com")
                       ? p.image
-                      : `${API}/uploads/${p.image}`
+                      : p.image?.startsWith("http")
+                        ? p.image
+                        : `${API}/uploads/${p.image}`
                   }
+                  onError={(e) => (e.target.src = "/fallback.png")}
                   alt="project"
                   className="w-full h-40 object-cover rounded-lg mb-4 border border-white/10"
                 />

@@ -2,12 +2,17 @@ import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: String,
+    title: { type: String, required: true, trim: true },
+    description: { type: String, trim: true },
     tech: [String],
-    image: String,
-    liveLink: String,
-    githubLink: String,
+
+    image: {
+      type: String,
+      default: "", // prevent undefined
+    },
+
+    liveLink: { type: String, trim: true },
+    githubLink: { type: String, trim: true },
   },
   { timestamps: true },
 );

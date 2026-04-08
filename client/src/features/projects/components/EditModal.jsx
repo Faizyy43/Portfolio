@@ -149,17 +149,23 @@ export default function EditModal({ project, close, refresh }) {
               <span className="text-xs text-gray-400">Change Image</span>
 
               <input
-                type="file"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  setForm({ ...form, image: file });
+  type="file"
+  accept="image/*" // ✅ restrict images
+  className="hidden"
+  onChange={(e) => {
+    const file = e.target.files[0];
+    setForm({ ...form, image: file });
 
-                  if (file) {
-                    setPreview(URL.createObjectURL(file));
-                  }
-                }}
-              />
+    if (file) {
+      // 🔥 CLEAN OLD PREVIEW (IMPORTANT)
+      if (preview && preview.startsWith("blob:")) {
+        URL.revokeObjectURL(preview);
+      }
+
+      setPreview(URL.createObjectURL(file));
+    }
+  }}
+/>
             </label>
 
             {preview && (

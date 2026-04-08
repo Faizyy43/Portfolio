@@ -42,9 +42,11 @@ function ProjectCard({ project, onOpen }) {
       <div className="relative overflow-hidden">
         <img
           src={
-            project.image?.startsWith("http")
+            project.image?.includes("res.cloudinary.com")
               ? project.image
-              : `${API}/uploads/${project.image}`
+              : project.image?.startsWith("http")
+                ? project.image
+                : `${API}/uploads/${project.image}`
           } // ✅ FIXED
           alt={project.title}
           className="w-full h-44 object-cover transition duration-500 group-hover:scale-110"
@@ -127,9 +129,11 @@ function ProjectModal({ project, onClose }) {
           <div className="overflow-hidden rounded-xl mb-4">
             <motion.img
               src={
-                project.image?.startsWith("http")
+                project.image?.includes("res.cloudinary.com")
                   ? project.image
-                  : `${API}/uploads/${project.image}`
+                  : project.image?.startsWith("http")
+                    ? project.image
+                    : `${API}/uploads/${project.image}`
               } // ✅ FIXED
               className="w-full h-64 object-cover"
               whileHover={{ scale: 1.1 }}

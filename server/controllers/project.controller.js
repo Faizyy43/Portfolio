@@ -1,11 +1,19 @@
 import Project from "../models/Project.js";
+import cloudinary from "../config/cloudinary.js"; // ✅ ADD
 
 // ➕ CREATE
 export const createProject = async (req, res) => {
   try {
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      imageUrl = result.secure_url;
+    }
+
     const project = await Project.create({
       ...req.body,
-      image: req.file ? req.file.filename : "",
+      image: imageUrl, // ✅ FIXED
     });
 
     res.status(201).json(project);
@@ -23,14 +31,16 @@ export const getProjects = async (req, res) => {
 // ✏️ UPDATE
 export const updateProject = async (req, res) => {
   try {
-    const updated = await Project.findByIdAndUpdate(
-      req.params.id,
-      {
-        ...req.body,
-        ...(req.file && { image: req.file.filename }),
-      },
-      { new: true }
-    );
+    let updateData = { ...req.body };
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      updateData.image = result.secure_url; // ✅ FIXED
+    }
+
+    const updated = await Project.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
 
     res.json(updated);
   } catch (err) {

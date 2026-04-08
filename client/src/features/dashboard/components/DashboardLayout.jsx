@@ -38,7 +38,9 @@ export default function DashboardLayout({ children, active, setActive }) {
           scrollbar-thin scrollbar-thumb-white/10
         "
         >
-          {children}
+          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+            {children}
+          </div>
         </div>
       </div>
     </div>

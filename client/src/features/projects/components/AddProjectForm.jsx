@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../../api/api";
 import toast from "react-hot-toast";
 import { UploadCloud } from "lucide-react";
@@ -14,6 +14,13 @@ export default function AddProjectForm({ refresh }) {
 
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
+
+  // 🔥 CLEAN PREVIEW MEMORY (IMPORTANT)
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -124,12 +131,16 @@ export default function AddProjectForm({ refresh }) {
 
           <input
             type="file"
+            accept="image/*" // ✅ ADD (only images)
             className="hidden"
             onChange={(e) => {
               const file = e.target.files[0];
               setForm({ ...form, image: file });
 
               if (file) {
+                // 🔥 REPLACE OLD PREVIEW (avoid memory leak)
+                if (preview) URL.revokeObjectURL(preview);
+
                 setPreview(URL.createObjectURL(file));
               }
             }}

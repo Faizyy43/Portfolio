@@ -1,4 +1,4 @@
-import { transporter } from "../config/mailer.js";
+import { createTransporter } from "../utils/mailer.js";
 import jwt from "jsonwebtoken";
 
 let otpStore = {};
@@ -11,7 +11,6 @@ export const sendOtp = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized ❌" });
     }
 
-    // 🔢 Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
     otpStore[email] = {
@@ -19,37 +18,31 @@ export const sendOtp = async (req, res) => {
       expires: Date.now() + 5 * 60 * 1000,
     };
 
-    // ❌ Check transporter before sending
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      return res.status(500).json({
-        message: "Email service not configured ❌",
-      });
-    }
+    // ✅ Create transporter AFTER env loaded
+    const transporter = createTransporter();
 
-    // ✉️ Send OTP (FAST now)
-    await transporter.sendMail({
-      from: `"Admin Panel" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "🔐 Admin Login OTP",
-      html: `
-        <h2>Your OTP Code</h2>
-        <p style="font-size:22px;font-weight:bold">${otp}</p>
-        <p>This OTP will expire in 5 minutes.</p>
-      `,
-    });
-
-    console.log("✅ OTP SENT:", otp);
-
+    // ✅ Send response FAST
     res.status(200).json({
       success: true,
-      message: "OTP sent successfully ✅",
+      message: "OTP sending... ⚡",
     });
+
+    // ✅ Send email safely
+    transporter
+      .sendMail({
+        from: `"Admin Panel" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "🔐 Admin Login OTP",
+        html: `<h2>${otp}</h2>`,
+      })
+      .then(() => console.log("✅ OTP SENT:", otp))
+      .catch((err) => console.log("❌ OTP ERROR:", err.message));
+
   } catch (error) {
-    console.error("❌ SEND OTP ERROR:", error.message);
+    console.log("❌ ERROR:", error.message);
 
     res.status(500).json({
-      success: false,
-      message: "Failed to send OTP ❌",
+      message: error.message,
     });
   }
 };

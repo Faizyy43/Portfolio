@@ -38,18 +38,11 @@ export default function ContactList() {
   };
 
   return (
-    <div
-      // className="
-      //   p-6 rounded-2xl
-      //   bg-gradient-to-br from-white/5 to-transparent
-      //   border border-white/10
-      // "
-    >
-      {/* Header */}
-      {/* <h3 className="mb-6 text-lg font-semibold">Client Leads</h3> */}
-
+    <div className="w-full px-2 sm:px-4 md:px-0">
       {/* Loading */}
-      {loading && <p className="text-gray-400">Loading leads...</p>}
+      {loading && (
+        <p className="text-gray-400 text-center py-10">Loading leads...</p>
+      )}
 
       {/* Empty */}
       {!loading && contacts.length === 0 && (
@@ -63,38 +56,42 @@ export default function ContactList() {
             key={c._id}
             className="
               group relative overflow-hidden
-              p-5 rounded-xl
-              bg-white/5 border border-white/10
+              p-4 sm:p-5 rounded-xl
+              bg-gradient-to-br from-white/5 to-transparent
+              border border-white/10
               hover:border-blue-500/40
               transition-all duration-300
+              backdrop-blur-xl
+              shadow-md
             "
           >
             {/* Glow */}
             <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 bg-blue-500/5 blur-xl transition" />
 
-            <div className="relative z-10 flex justify-between gap-4">
+            {/* MAIN CONTAINER */}
+            <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between gap-4">
               {/* LEFT */}
-              <div className="space-y-1">
-                <p className="font-semibold flex items-center gap-2">
+              <div className="space-y-1 w-full">
+                <p className="font-semibold flex items-center gap-2 text-sm sm:text-base">
                   <User size={14} />
                   {c.name}
                 </p>
 
-                <p className="text-sm text-gray-400 flex items-center gap-2">
+                <p className="text-xs sm:text-sm text-gray-400 flex items-center gap-2 break-all">
                   <Mail size={14} />
                   {c.email}
                 </p>
 
                 {/* Message */}
                 {c.message && (
-                  <p className="text-sm text-gray-300 mt-2 line-clamp-2">
+                  <p className="text-xs sm:text-sm text-gray-300 mt-2 line-clamp-2">
                     {c.message}
                   </p>
                 )}
 
                 {/* Date */}
                 {c.createdAt && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
                     {new Date(c.createdAt).toLocaleString()}
                   </p>
                 )}
@@ -102,7 +99,7 @@ export default function ContactList() {
                 {/* Status Badge */}
                 <span
                   className={`
-                    inline-block mt-2 text-xs px-2 py-1 rounded-full
+                    inline-block mt-2 text-[10px] sm:text-xs px-2 py-1 rounded-full
                     ${
                       c.status === "closed"
                         ? "bg-green-500/20 text-green-400"
@@ -117,7 +114,7 @@ export default function ContactList() {
               </div>
 
               {/* RIGHT ACTIONS */}
-              <div className="flex flex-col gap-2 items-end">
+              <div className="flex sm:flex-col gap-2 sm:items-end justify-end">
                 <button
                   onClick={() => updateStatus(c._id, "contacted")}
                   disabled={actionLoading === c._id}
@@ -125,7 +122,7 @@ export default function ContactList() {
                     flex items-center gap-1 px-3 py-1 rounded-lg
                     bg-yellow-500/20 text-yellow-400
                     hover:bg-yellow-500/30 transition
-                    text-xs
+                    text-[10px] sm:text-xs
                   "
                 >
                   <Clock size={14} />
@@ -139,7 +136,7 @@ export default function ContactList() {
                     flex items-center gap-1 px-3 py-1 rounded-lg
                     bg-green-500/20 text-green-400
                     hover:bg-green-500/30 transition
-                    text-xs
+                    text-[10px] sm:text-xs
                   "
                 >
                   <CheckCircle size={14} />

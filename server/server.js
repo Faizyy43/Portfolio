@@ -11,6 +11,7 @@ import contactRoutes from "./routes/contact.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import emailRoutes from "./routes/email.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import uploadRoutes from "./routes/upload.routes.js"
 
 // ✅ ENV
 dotenv.config();
@@ -98,7 +99,7 @@ mongoose
   .catch((err) => console.error("❌ DB Error:", err));
 
 /* ================= STATIC ================= */
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
 
 /* ================= ROUTES ================= */
 app.use("/api/projects", projectRoutes);
@@ -106,6 +107,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api", uploadRoutes);
 
 /* ================= HEALTH CHECK ================= */
 app.get("/", (req, res) => {

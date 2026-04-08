@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import Services from "./features/services/pages/Services";
 import ReviewBot from "./components/ReviewBot";
 import AnimatedCursor from "./components/AnimatedCursor";
+import TitleManager from "./components/TitleManager";
 
 export default function App() {
   const location = useLocation();
@@ -96,6 +97,7 @@ export default function App() {
       {/* <WhatsAppButton /> */}
       {!hideLayout && <ReviewBot />}
       <AnimatedCursor />
+      <TitleManager />
       {!hideLayout && <Footer />}
       {/* {!location.pathname.includes("dashboard") && <Footer />} */}
     </>

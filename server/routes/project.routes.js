@@ -10,16 +10,12 @@ import { upload } from "../middleware/upload.js";
 
 const router = express.Router();
 
-// ➕ CREATE (Admin)
 router.post("/", upload.single("image"), createProject);
 
-// 📥 GET ALL (Public)
 router.get("/", getProjects);
 
-// ✏️ UPDATE
 router.put("/:id", upload.single("image"), updateProject);
 
-// ❌ DELETE
 router.delete("/:id", deleteProject);
 
 export default router;

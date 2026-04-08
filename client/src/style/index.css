@@ -216,3 +216,14 @@ html.dark .glass-card {
 body {
   cursor: none;
 }
+
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 10px;
+}
+::-webkit-scrollbar {
+  display: none;
+}

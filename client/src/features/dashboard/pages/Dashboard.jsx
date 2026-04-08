@@ -123,15 +123,21 @@ export default function Dashboard() {
 
           {/* ================= CLIENTS ================= */}
           {active === "clients" && (
-            <>
-              <SectionCard title="Client Pipeline">
-                <KanbanBoard />
-              </SectionCard>
+            <div className="flex flex-col gap-6 h-full overflow-hidden">
+              {/* 🔥 KANBAN (FIXED HEIGHT) */}
+              <div className="h-[65vh]">
+                <SectionCard title="Client Pipeline" className="h-full">
+                  <KanbanBoard />
+                </SectionCard>
+              </div>
 
-              <SectionCard title="Contacts">
-                <ContactList />
-              </SectionCard>
-            </>
+              {/* 🔥 CONTACTS (SCROLLABLE AREA) */}
+              <div className="flex-1 overflow-y-auto">
+                <SectionCard title="Contacts" className="h-full">
+                  <ContactList />
+                </SectionCard>
+              </div>
+            </div>
           )}
 
           {/* ================= REVIEWS ================= */}
