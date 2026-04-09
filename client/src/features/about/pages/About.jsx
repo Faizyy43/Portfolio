@@ -104,7 +104,7 @@ export default function About() {
 
         {/* 🔥 TECH STACK */}
         <section>
-          <h2 className="text-sm uppercase tracking-[0.3em] opacity-50 mb-12">
+          <h2 className="text-sm uppercase tracking-[0.3em] opacity-50 mb-10 pt-7">
             Expertise
           </h2>
 

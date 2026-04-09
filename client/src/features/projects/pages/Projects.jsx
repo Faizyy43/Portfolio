@@ -9,12 +9,9 @@ import { FiExternalLink } from "react-icons/fi";
 const fixUrl = (url) => {
   if (!url) return "#";
   url = url.trim();
-
-  // ✅ FIX: handle broken cases
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     return "https://" + url;
   }
-
   return url;
 };
 
@@ -49,29 +46,25 @@ function ProjectCard({ project, onOpen }) {
           className="w-full h-44 object-cover transition duration-500 group-hover:scale-110"
         />
 
-        {/* HOVER */}
+        {/* 🔥 HOVER ICONS */}
         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center gap-5">
-          {/* GITHUB */}
           {project.githubLink && (
             <a
               href={fixUrl(project.githubLink)}
               target="_blank"
-              rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-gray-500/30 hover:bg-gray-200 transition hover:scale-110"
+              className="p-3 rounded-full bg-white/10 hover:bg-gray-200 transition"
             >
               <FaGithub size={20} />
             </a>
           )}
 
-          {/* LIVE FIXED */}
           {project.liveLink && (
             <a
-              href={fixUrl(project.liveLink)} // ✅ FINAL FIX
+              href={fixUrl(project.liveLink)}
               target="_blank"
-              rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-gray-500/30 hover:bg-blue-500 transition hover:scale-110"
+              className="p-3 rounded-full bg-white/10 hover:bg-blue-500 transition"
             >
               <FiExternalLink size={20} />
             </a>
@@ -82,12 +75,7 @@ function ProjectCard({ project, onOpen }) {
       {/* CONTENT */}
       <div className="p-5">
         <h3 className="text-lg font-semibold">{project.title}</h3>
-
-        <p
-          className={`text-sm mt-2 line-clamp-2 ${
-            theme === "light" ? "text-gray-600" : "text-gray-400"
-          }`}
-        >
+        <p className="text-sm mt-2 opacity-70 line-clamp-2">
           {project.description}
         </p>
       </div>
@@ -95,7 +83,7 @@ function ProjectCard({ project, onOpen }) {
   );
 }
 
-/* 🔥 MODAL */
+/* 🔥 MODAL (UPDATED PROFESSIONAL) */
 function ProjectModal({ project, onClose }) {
   const { theme } = useTheme();
   if (!project) return null;
@@ -133,20 +121,32 @@ function ProjectModal({ project, onClose }) {
           <h2 className="text-2xl mt-4 font-semibold">{project.title}</h2>
           <p className="mt-2 text-gray-400">{project.description}</p>
 
-          {/* LIVE BUTTON IN MODAL */}
-          {project.liveLink && (
-            <a
-              href={fixUrl(project.liveLink)}
-              target="_blank"
-              className="inline-block mt-4 px-4 py-2 bg-blue-500 rounded-lg"
-            >
-              Visit Project
-            </a>
-          )}
+          {/* 🔥 ICONS IN MODAL (NO BUTTONS NOW) */}
+          <div className="flex gap-4 mt-5">
+            {project.githubLink && (
+              <a
+                href={fixUrl(project.githubLink)}
+                target="_blank"
+                className="p-3 rounded-full bg-white/10 hover:bg-gray-200 transition"
+              >
+                <FaGithub size={20} />
+              </a>
+            )}
+
+            {project.liveLink && (
+              <a
+                href={fixUrl(project.liveLink)}
+                target="_blank"
+                className="p-3 rounded-full bg-white/10 hover:bg-blue-500 transition"
+              >
+                <FiExternalLink size={20} />
+              </a>
+            )}
+          </div>
 
           <button
             onClick={onClose}
-            className="mt-6 px-5 py-2 border rounded-lg hover:bg-blue-500"
+            className="mt-6 px-4 py-2 border rounded-lg hover:bg-blue-500"
           >
             Close
           </button>
@@ -172,18 +172,56 @@ export default function Projects() {
   }, []);
 
   return (
-    <div
-      className={`min-h-screen p-6 ${theme === "light" ? "bg-white" : "bg-black"}`}
-    >
-      {loading && <p className="text-center">Loading...</p>}
+    <div className="relative min-h-screen px-6 py-12 bg-black text-white overflow-hidden">
+      {/* 🌌 STAR GRID BACKGROUND */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:24px_24px]" />
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {projects.map((p) => (
-          <ProjectCard key={p._id} project={p} onOpen={setSelected} />
-        ))}
+      {/* 🌈 TOP GLOW (same like your About/Home) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl opacity-40" />
+
+      {/* ✅ YOUR ORIGINAL CONTENT */}
+      <div className="relative z-10">
+        {/* 🔥 PROFESSIONAL HEADER */}
+        <div className="text-center mb-14 pt-16">
+          {/* SMALL TITLE */}
+          <p className="text-xs tracking-[0.3em] text-gray-500 uppercase">
+            Portfolio
+          </p>
+
+          {/* MAIN TITLE */}
+          <h1 className="text-4xl md:text-5xl font-bold mt-4 text-white">
+            Selected Work
+          </h1>
+
+          {/* DESCRIPTION */}
+          <p className="mt-4 max-w-xl mx-auto text-gray-400">
+            A collection of production-ready applications focused on
+            performance, scalability, and clean architecture.
+          </p>
+
+          {/* 🔥 BLUE SHINE LINE */}
+          <div className="mt-6 flex justify-center">
+            <div className="relative w-28 h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent">
+              {/* glow */}
+              <div className="absolute inset-0 blur-md bg-blue-500/60 animate-pulse" />
+
+              {/* center highlight */}
+              <div className="absolute left-1/2 -translate-x-1/2 w-10 h-[2px] bg-blue-400" />
+            </div>
+          </div>
+        </div>
+
+        {loading && <p className="text-center">Loading...</p>}
+
+        {/* GRID */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {projects.map((p) => (
+            <ProjectCard key={p._id} project={p} onOpen={setSelected} />
+          ))}
+        </div>
+
+        <ProjectModal project={selected} onClose={() => setSelected(null)} />
       </div>
-
-      <ProjectModal project={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }
