@@ -172,41 +172,76 @@ export default function Projects() {
   }, []);
 
   return (
-    <div className="relative min-h-screen px-6 py-12 bg-black text-white overflow-hidden">
-      {/* 🌌 STAR GRID BACKGROUND */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:24px_24px]" />
+    <div
+      className={`relative min-h-screen px-6 py-12 overflow-hidden ${
+        theme === "light" ? "bg-gray-50 text-black" : "bg-black text-white"
+      }`}
+    >
+      {/* 🌌 GRID BACKGROUND */}
+      <div
+        className={`absolute inset-0 ${
+          theme === "light"
+            ? "bg-[radial-gradient(circle,rgba(0,0,0,0.06)_1px,transparent_1px)]"
+            : "bg-[radial-gradient(circle,rgba(255,255,255,0.08)_1px,transparent_1px)]"
+        } [background-size:24px_24px]`}
+      />
 
-      {/* 🌈 TOP GLOW (same like your About/Home) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl opacity-40" />
+      {/* 🌈 GLOW EFFECT */}
+      <div
+        className={`absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] blur-3xl opacity-40 ${
+          theme === "light"
+            ? "bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20"
+            : "bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20"
+        }`}
+      />
 
-      {/* ✅ YOUR ORIGINAL CONTENT */}
+      {/* ✅ CONTENT */}
       <div className="relative z-10">
         {/* 🔥 PROFESSIONAL HEADER */}
         <div className="text-center mb-14 pt-16">
           {/* SMALL TITLE */}
-          <p className="text-xs tracking-[0.3em] text-gray-500 uppercase">
+          <p
+            className={`text-xs tracking-[0.3em] uppercase ${
+              theme === "light" ? "text-gray-600" : "text-gray-500"
+            }`}
+          >
             Portfolio
           </p>
 
           {/* MAIN TITLE */}
-          <h1 className="text-4xl md:text-5xl font-bold mt-4 text-white">
+          <h1
+            className={`text-4xl md:text-5xl font-bold mt-4 ${
+              theme === "light" ? "text-gray-900" : "text-white"
+            }`}
+          >
             Selected Work
           </h1>
 
           {/* DESCRIPTION */}
-          <p className="mt-4 max-w-xl mx-auto text-gray-400">
+          <p
+            className={`mt-4 max-w-xl mx-auto ${
+              theme === "light" ? "text-gray-600" : "text-gray-400"
+            }`}
+          >
             A collection of production-ready applications focused on
             performance, scalability, and clean architecture.
           </p>
 
-          {/* 🔥 BLUE SHINE LINE */}
+          {/* 🔥 SHINE LINE */}
           <div className="mt-6 flex justify-center">
-            <div className="relative w-28 h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent">
+            <div
+              className={`relative w-28 h-[2px] ${
+                theme === "light"
+                  ? "bg-gradient-to-r from-transparent via-blue-400 to-transparent"
+                  : "bg-gradient-to-r from-transparent via-blue-500 to-transparent"
+              }`}
+            >
               {/* glow */}
-              <div className="absolute inset-0 blur-md bg-blue-500/60 animate-pulse" />
-
-              {/* center highlight */}
-              <div className="absolute left-1/2 -translate-x-1/2 w-10 h-[2px] bg-blue-400" />
+              <div
+                className={`absolute inset-0 blur-md ${
+                  theme === "light" ? "bg-blue-400/60" : "bg-blue-500/60"
+                }`}
+              />
             </div>
           </div>
         </div>
