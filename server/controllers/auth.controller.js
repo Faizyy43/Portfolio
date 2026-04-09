@@ -7,7 +7,12 @@ export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
 
+    console.log("📩 Incoming email:", email);
+    console.log("🔐 ADMIN_EMAIL:", process.env.ADMIN_EMAIL);
+
+    // ✅ Check email
     if (email !== process.env.ADMIN_EMAIL) {
+      console.log("❌ Email mismatch");
       return res.status(403).json({ message: "Unauthorized ❌" });
     }
 
@@ -18,31 +23,35 @@ export const sendOtp = async (req, res) => {
       expires: Date.now() + 5 * 60 * 1000,
     };
 
-    // ✅ Create transporter AFTER env loaded
+    console.log("📦 OTP generated:", otp);
+
     const transporter = createTransporter();
 
-    // ✅ Send response FAST
-    res.status(200).json({
-      success: true,
-      message: "OTP sending... ⚡",
+    // ✅ Verify transporter connection (NEW - IMPORTANT)
+    await transporter.verify();
+    console.log("✅ Mail server ready");
+
+    // ✅ Send mail
+    const info = await transporter.sendMail({
+      from: `"Admin Panel" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "🔐 Admin Login OTP",
+      html: `<h2>${otp}</h2>`,
     });
 
-    // ✅ Send email safely
-    transporter
-      .sendMail({
-        from: `"Admin Panel" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "🔐 Admin Login OTP",
-        html: `<h2>${otp}</h2>`,
-      })
-      .then(() => console.log("✅ OTP SENT:", otp))
-      .catch((err) => console.log("❌ OTP ERROR:", err.message));
+    console.log("✅ OTP SENT:", otp);
+    console.log("📨 Message ID:", info.messageId);
 
+    res.status(200).json({
+      success: true,
+      message: "OTP sent ✅",
+    });
   } catch (error) {
-    console.log("❌ ERROR:", error.message);
+    console.error("❌ SEND OTP ERROR FULL:", error); // full error (not just message)
 
     res.status(500).json({
-      message: error.message,
+      message: "Failed to send OTP ❌",
+      error: error.message,
     });
   }
 };
