@@ -98,9 +98,6 @@ mongoose
   .then(() => console.log("✅ DB Connected"))
   .catch((err) => console.error("❌ DB Error:", err));
 
-/* ================= STATIC ================= */
-// app.use("/uploads", express.static("uploads"));
-
 /* ================= ROUTES ================= */
 app.use("/api/projects", projectRoutes);
 app.use("/api/contact", contactRoutes);

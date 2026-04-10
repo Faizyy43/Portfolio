@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../../../api/api";
 import toast from "react-hot-toast";
 import { UploadCloud } from "lucide-react";
+import axios from "axios";
 
 export default function AddProjectForm({ refresh }) {
   const [form, setForm] = useState({
@@ -34,20 +35,21 @@ export default function AddProjectForm({ refresh }) {
 
       const formData = new FormData();
 
-      // ✅ SAME LOGIC (NOT REMOVED)
       formData.append("title", form.title);
       formData.append("description", form.description);
       formData.append("githubLink", form.github);
       formData.append("liveLink", form.live);
 
-      if (form.image) {
+      // 🔥 IMPORTANT FIX
+      if (form.image instanceof File) {
         formData.append("image", form.image);
       }
 
-      await api.post("/projects", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      console.log("FORM IMAGE:", form.image); // DEBUG
+
+      await fetch(`${import.meta.env.VITE_API_URL}/api/projects`, {
+        method: "POST",
+        body: formData,
       });
 
       toast.success("Project Added 🚀");
@@ -129,8 +131,9 @@ export default function AddProjectForm({ refresh }) {
             Click to upload project image
           </span>
 
-          <input
+          {/* <input
             type="file"
+            name="image0"
             accept="image/*" // ✅ ADD (only images)
             className="hidden"
             onChange={(e) => {
@@ -143,6 +146,28 @@ export default function AddProjectForm({ refresh }) {
 
                 setPreview(URL.createObjectURL(file));
               }
+            }}
+          /> */}
+
+          <input
+            type="file"
+            name="image" // ✅ MUST MATCH BACKEND
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files[0];
+
+              console.log("SELECTED FILE:", file); // DEBUG
+
+              if (!file) return;
+
+              setForm((prev) => ({
+                ...prev,
+                image: file, // ✅ MUST BE FILE OBJECT
+              }));
+
+              if (preview) URL.revokeObjectURL(preview);
+              setPreview(URL.createObjectURL(file));
             }}
           />
         </label>

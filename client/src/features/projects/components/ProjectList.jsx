@@ -50,18 +50,18 @@ export default function ProjectList({ projects, refresh }) {
               {/* Glow */}
               <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition bg-blue-500/5 blur-xl" />
               {/* Image */}
-              {p.image && (
+              {p.image ? (
                 <img
-                  src={
-                    p.image?.includes("res.cloudinary.com")
-                      ? p.image
-                      : p.image?.startsWith("http")
-                        ? p.image
-                        : `${API}/uploads/${p.image}`
-                  }
+                  src={p.image}
                   onError={(e) => (e.target.src = "/fallback.png")}
                   alt="project"
-                  className="w-full h-40 object-cover rounded-lg mb-4 border border-white/10"
+                  className="w-full h-40 object-cover rounded-lg mb-4 border"
+                />
+              ) : (
+                <img
+                  src="/fallback.png"
+                  alt="fallback"
+                  className="w-full h-40 object-cover rounded-lg mb-4 border"
                 />
               )}
 

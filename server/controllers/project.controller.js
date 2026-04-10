@@ -27,17 +27,23 @@ const uploadToCloudinary = (file) => {
 // ➕ CREATE
 export const createProject = async (req, res) => {
   try {
+    console.log("===== DEBUG START =====");
+    console.log("HEADERS:", req.headers["content-type"]);
+    console.log("FILE:", req.file);
+    console.log("BODY:", req.body);
+    console.log("===== DEBUG END =====");
+
     let imageUrl = "";
 
     if (req.file) {
-      try {
-        const result = await uploadToCloudinary(req.file);
-        if (result) {
-          imageUrl = result.secure_url;
-        }
-      } catch (err) {
-        console.log("❌ Cloudinary error:", err.message);
+      const result = await uploadToCloudinary(req.file);
+      if (result) {
+        imageUrl = result.secure_url;
       }
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Image is required" });
     }
 
     const project = await Project.create({

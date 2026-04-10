@@ -2,4 +2,15 @@ import multer from "multer";
 
 const storage = multer.memoryStorage();
 
-export const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only images allowed"), false);
+  }
+};
+
+export const upload = multer({
+  storage,
+  fileFilter,
+});
