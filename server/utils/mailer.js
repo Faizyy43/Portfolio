@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import dns from "dns";
 
 export const createTransporter = () => {
   const user = process.env.EMAIL_USER?.trim();
@@ -23,9 +24,11 @@ export const createTransporter = () => {
 
     // 🔥 FORCE IPv4 at socket level
     family: 4, // 🔥 FORCE IPv4 (VERY IMPORTANT)
-    connectionTimeout: 10000, // 10 sec
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+
+    // 🔥 FORCE IPv4 DNS resolution
+    lookup: (hostname, options, callback) => {
+      return dns.lookup(hostname, { family: 4 }, callback);
+    },
   });
 
   return transporter;
