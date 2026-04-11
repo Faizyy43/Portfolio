@@ -23,6 +23,9 @@ export const createTransporter = () => {
 
     // 🔥 FORCE IPv4 at socket level
     family: 4, // 🔥 FORCE IPv4 (VERY IMPORTANT)
+    connectionTimeout: 10000, // 10 sec
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 
   return transporter;
