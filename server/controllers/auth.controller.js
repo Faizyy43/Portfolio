@@ -3,6 +3,9 @@ import jwt from "jsonwebtoken";
 
 let otpStore = {};
 
+console.log(process.env.EMAIL_USER, "");
+
+
 export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -28,7 +31,7 @@ export const sendOtp = async (req, res) => {
     const transporter = createTransporter();
 
     // ✅ Verify transporter connection (NEW - IMPORTANT)
-    await transporter.verify();
+    // await transporter.verify();
     console.log("✅ Mail server ready");
 
     // ✅ Send mail

@@ -12,12 +12,17 @@ export const createTransporter = () => {
   }
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    pool: true,
+    host: "smtp.gmail.com", // ✅ explicit host
+    port: 587,
+    secure: false,
     auth: {
       user,
       pass,
     },
+    pool: true,
+
+    // 🔥 FORCE IPv4 at socket level
+    family: 4, // 🔥 FORCE IPv4 (VERY IMPORTANT)
   });
 
   return transporter;

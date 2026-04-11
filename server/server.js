@@ -11,7 +11,9 @@ import contactRoutes from "./routes/contact.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import emailRoutes from "./routes/email.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
-import uploadRoutes from "./routes/upload.routes.js"
+import uploadRoutes from "./routes/upload.routes.js";
+
+// dns.setDefaultResultOrder("ipv4first");
 
 // ✅ ENV
 dotenv.config();
