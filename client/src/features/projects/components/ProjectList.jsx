@@ -52,10 +52,19 @@ export default function ProjectList({ projects, refresh }) {
               {/* Image */}
               {p.image ? (
                 <img
-                  src={p.image}
-                  onError={(e) => (e.target.src = "/fallback.png")}
+                  src={
+                    p.image
+                      ? p.image.startsWith("http")
+                        ? p.image
+                        : `${API}/${p.image}`
+                      : "/fallback.png"
+                  }
                   alt="project"
-                  className="w-full h-40 object-cover rounded-lg mb-4 border"
+                  className="w-full h-40 object-cover rounded-lg"
+                  onError={(e) => {
+                    e.target.onerror = null; // 🔥 STOP LOOP
+                    e.target.src = "/fallback.png";
+                  }}
                 />
               ) : (
                 <img

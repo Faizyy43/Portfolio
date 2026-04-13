@@ -1,35 +1,28 @@
-import nodemailer from "nodemailer";
-import dns from "dns";
+import { Resend } from "resend";
 
-export const createTransporter = () => {
-  const user = process.env.EMAIL_USER?.trim();
-  const pass = process.env.EMAIL_PASS?.trim();
+export const sendMail = async ({ to, subject, html, replyTo }) => {
+  try {
+    const apiKey = process.env.RESEND_API_KEY;
 
-  console.log("EMAIL_USER:", user);
-  console.log("EMAIL_PASS exists:", !!pass);
+    if (!apiKey) {
+      throw new Error("❌ RESEND_API_KEY missing in .env");
+    }
 
-  if (!user || !pass) {
-    throw new Error("Email credentials missing ❌");
+    const resend = new Resend(apiKey);
+
+    const response = await resend.emails.send({
+      from: "Portfolio <onboarding@resend.dev>",
+      to,
+      subject,
+      html,
+      reply_to: replyTo || undefined,
+    });
+
+    console.log("✅ Resend Email sent:", response);
+
+    return response;
+  } catch (error) {
+    console.error("❌ Resend Error:", error);
+    throw error;
   }
-
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com", // ✅ explicit host
-    port: 587,
-    secure: false,
-    auth: {
-      user,
-      pass,
-    },
-    pool: true,
-
-    // 🔥 FORCE IPv4 at socket level
-    family: 4, // 🔥 FORCE IPv4 (VERY IMPORTANT)
-
-    // 🔥 FORCE IPv4 DNS resolution
-    lookup: (hostname, options, callback) => {
-      return dns.lookup(hostname, { family: 4 }, callback);
-    },
-  });
-
-  return transporter;
 };

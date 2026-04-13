@@ -23,55 +23,66 @@ export default function AddProjectForm({ refresh }) {
     };
   }, [preview]);
 
-  const submit = async (e) => {
-    e.preventDefault();
+const submit = async (e) => {
+  e.preventDefault();
 
-    if (!form.title || !form.description) {
-      return toast.error("Title & Description required ⚠️");
-    }
+  if (!form.title || !form.description) {
+    return toast.error("Title & Description required ⚠️");
+  }
 
-    try {
-      setLoading(true);
+  if (!form.image) {
+    return toast.error("Image required ⚠️");
+  }
 
-      const formData = new FormData();
+  try {
+    setLoading(true);
 
-      formData.append("title", form.title);
-      formData.append("description", form.description);
-      formData.append("githubLink", form.github);
-      formData.append("liveLink", form.live);
+    // ✅ STEP 1: UPLOAD IMAGE
+    const imgData = new FormData();
+    imgData.append("image", form.image);
 
-      // 🔥 IMPORTANT FIX
-      if (form.image instanceof File) {
-        formData.append("image", form.image);
-      }
+    const uploadRes = await api.post("/upload", imgData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-      console.log("FORM IMAGE:", form.image); // DEBUG
+    const imageUrl = uploadRes.data.image;
 
-      await fetch(`${import.meta.env.VITE_API_URL}/api/projects`, {
-        method: "POST",
-        body: formData,
-      });
+    console.log("IMAGE URL:", imageUrl);
 
-      toast.success("Project Added 🚀");
+    // ✅ STEP 2: SAVE PROJECT (JSON ONLY)
+    const projectRes = await api.post("/projects", {
+      title: form.title,
+      description: form.description,
+      githubLink: form.github,
+      liveLink: form.live,
+      image: imageUrl,
+    });
 
-      setForm({
-        title: "",
-        description: "",
-        github: "",
-        live: "",
-        image: null,
-      });
+    console.log("PROJECT:", projectRes.data);
 
-      setPreview(null);
-      refresh();
-    } catch (err) {
-      console.log(err);
-      toast.error("Something went wrong ❌");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Project Added 🚀");
 
+    setForm({
+      title: "",
+      description: "",
+      github: "",
+      live: "",
+      image: null,
+    });
+
+    setPreview(null);
+    refresh();
+
+  } catch (err) {
+    console.log("ERROR:", err.response?.data || err.message);
+
+    toast.error(
+      err.response?.data?.error || "Something went wrong ❌"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <form
       onSubmit={submit}

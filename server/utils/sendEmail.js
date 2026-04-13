@@ -1,7 +1,9 @@
-import { transporter } from "./mailer.js";
+import { createTransporter } from "./nodemailer.js";
 
 export const sendEmail = async (data) => {
   try {
+    const transporter = createTransporter();
+
     await transporter.sendMail({
       from: `"Portfolio" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,

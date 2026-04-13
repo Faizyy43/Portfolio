@@ -20,6 +20,8 @@ function ProjectCard({ project, onOpen }) {
   const { theme } = useTheme();
   const API = import.meta.env.VITE_API_URL;
 
+  console.log("PROJECT:", project);
+
   return (
     <motion.div
       whileHover={{ scale: 1.04, rotateX: 4, rotateY: -4 }}
@@ -36,16 +38,19 @@ function ProjectCard({ project, onOpen }) {
       <div className="relative overflow-hidden">
         <img
           src={
-            project.image?.includes("res.cloudinary.com")
-              ? project.image
-              : project.image?.startsWith("http")
+            project.image
+              ? project.image.startsWith("http")
                 ? project.image
-                : `${API}/uploads/${project.image}`
+                : `${API}/${project.image}`
+              : "/fallback.png"
           }
           alt={project.title}
           className="w-full h-44 object-cover transition duration-500 group-hover:scale-110"
+          onError={(e) => {
+            e.target.onerror = null; // 🔥 STOP LOOP
+            e.target.src = "/fallback.png"; // ✅ LOCAL SAFE IMAGE
+          }}
         />
-
         {/* 🔥 HOVER ICONS */}
         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center gap-5">
           {project.githubLink && (

@@ -1,7 +1,19 @@
+// 🔥 LOAD ENV FIRST (VERY IMPORTANT)
+import dotenv from "dotenv";
+dotenv.config();
+
+// 🔥 DEBUG (REMOVE AFTER TEST)
+console.log(
+  "RESEND_API_KEY:",
+  process.env.RESEND_API_KEY ? "Loaded ✅" : "Missing ❌",
+);
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("MONGO_URI:", process.env.MONGO_URI ? "Loaded ✅" : "Missing ❌");
+
 import express from "express";
+import cloudinary from "./config/cloudinary.js";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
@@ -12,11 +24,6 @@ import authRoutes from "./routes/auth.routes.js";
 import emailRoutes from "./routes/email.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
-
-// dns.setDefaultResultOrder("ipv4first");
-
-// ✅ ENV
-dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
@@ -30,22 +37,22 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow postman / mobile
+      if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
         console.log("❌ CORS BLOCKED:", origin);
-        return callback(null, false); // don't crash server
+        return callback(null, false);
       }
     },
     credentials: true,
   }),
 );
 
-/* 🔥 IMPORTANT: HANDLE PREFLIGHT */
+/* 🔥 PREFLIGHT FIX */
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*"); // TEMP SAFE FIX
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization",
